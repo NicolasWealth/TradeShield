@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { useCreateEvent, useTraceData } from "@/hooks/useTraceData";
 import { formatDate, formatNumber, shortId, titleCase } from "@/lib/format";
+import { createEventHash } from "@/services/eventHash";
 import type { CustodyEvent, CustodyEventType } from "@/types";
 
 export const Route = createFileRoute("/batches/$batchId")({
@@ -80,7 +81,7 @@ function BatchDetailPage() {
 
   const submit = () => {
     const last = batchEvents[batchEvents.length - 1];
-    const event: CustodyEvent = {
+    const rawEvent = {
       eventId: shortId("EVT"),
       batchId,
       type: form.type,
@@ -92,11 +93,15 @@ function BatchDetailPage() {
       previousEventId: last ? last.eventId : null,
       eventHash: "",
       blockchainTxHash: "",
-      verificationStatus: "PENDING_INTEGRATION",
+      verificationStatus: "PENDING_INTEGRATION" as const,
+    };
+    const event: CustodyEvent = {
+      ...rawEvent,
+      eventHash: createEventHash(rawEvent),
     };
     createEvent.mutate(event, {
       onSuccess: () => {
-        toast.success("Custody event recorded — chain anchoring pending");
+        toast.success("Custody event recorded — hash generated & chain anchoring pending");
         setOpen(false);
       },
     });

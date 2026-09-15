@@ -54,3 +54,95 @@ export function VerificationBadge({ status }: { status: VerificationStatus }) {
     </span>
   );
 }
+
+export function CryptoStatusBadge({
+  status,
+}: {
+  status: "MATCH" | "MISMATCH" | "NO_STORED_HASH" | "INVALID_DATA";
+}) {
+  if (status === "MATCH") {
+    return (
+      <span className={cn(base, "border-ok-500/45 bg-ok-500/12 text-ok-400")}>
+        CRYPTOGRAPHIC MATCH
+      </span>
+    );
+  }
+  if (status === "MISMATCH") {
+    return (
+      <span className={cn(base, "border-crit-500/60 bg-crit-500/18 text-crit-400 font-bold")}>
+        CRYPTOGRAPHIC MISMATCH
+      </span>
+    );
+  }
+  return (
+    <span className={cn(base, "border-seal-500/40 bg-seal-500/10 text-seal-400")}>
+      HASH NOT AVAILABLE
+    </span>
+  );
+}
+
+export function BlockchainStatusBadge({
+  status,
+}: {
+  status: "VERIFIED" | "PENDING_INTEGRATION" | "UNCONFIGURED" | string;
+}) {
+  if (status === "VERIFIED") {
+    return (
+      <span className={cn(base, "border-ok-500/45 bg-ok-500/12 text-ok-400 font-semibold")}>
+        BLOCKCHAIN VERIFIED
+      </span>
+    );
+  }
+  return (
+    <span className={cn(base, "border-mist-500/30 bg-secondary text-mist-400")}>
+      PENDING BLOCKCHAIN ANCHOR
+    </span>
+  );
+}
+
+export function CombinedStatusBadge({
+  state,
+}: {
+  state:
+    | "LOCAL_VERIFIED"
+    | "BLOCKCHAIN_VERIFIED"
+    | "FULLY_VERIFIED"
+    | "TAMPERED"
+    | "PENDING_BLOCKCHAIN"
+    | "VERIFICATION_UNAVAILABLE"
+    | string;
+}) {
+  if (state === "FULLY_VERIFIED" || state === "BLOCKCHAIN_VERIFIED") {
+    return (
+      <span className={cn(base, "border-ok-500/50 bg-ok-500/15 text-ok-400 font-bold")}>
+        FULLY VERIFIED
+      </span>
+    );
+  }
+  if (state === "LOCAL_VERIFIED") {
+    return (
+      <span className={cn(base, "border-ok-500/40 bg-ok-500/10 text-ok-400")}>
+        LOCAL VERIFIED
+      </span>
+    );
+  }
+  if (state === "TAMPERED" || state === "CRYPTOGRAPHIC_MISMATCH") {
+    return (
+      <span className={cn(base, "border-crit-500/60 bg-crit-500/18 text-crit-400 font-bold")}>
+        TAMPERED / MISMATCH
+      </span>
+    );
+  }
+  if (state === "PENDING_BLOCKCHAIN") {
+    return (
+      <span className={cn(base, "border-mist-500/30 bg-secondary text-mist-400")}>
+        PENDING ANCHOR
+      </span>
+    );
+  }
+  return (
+    <span className={cn(base, "border-seal-500/40 bg-seal-500/10 text-seal-400")}>
+      UNAVAILABLE
+    </span>
+  );
+}

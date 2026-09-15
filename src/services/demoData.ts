@@ -4,6 +4,7 @@
  * records inside components.
  */
 import type { Batch, CustodyEvent, Incident, Organization, User } from "@/types";
+import { createEventHash } from "./eventHash";
 
 export const DEMO_FLAG = { isDemo: true as const };
 
@@ -161,14 +162,20 @@ export const demoBatches: Batch[] = [
 ];
 
 let seq = 0;
-const evt = (e: Omit<CustodyEvent, "eventId" | "eventHash" | "blockchainTxHash" | "verificationStatus" | "isDemo">): CustodyEvent => ({
-  eventId: `EVT-${String(++seq).padStart(4, "0")}`,
-  eventHash: "",
-  blockchainTxHash: "",
-  verificationStatus: "PENDING_INTEGRATION",
-  ...e,
-  ...DEMO_FLAG,
-});
+const evt = (e: Omit<CustodyEvent, "eventId" | "eventHash" | "blockchainTxHash" | "verificationStatus" | "isDemo">): CustodyEvent => {
+  const baseEvent = {
+    eventId: `EVT-${String(++seq).padStart(4, "0")}`,
+    eventHash: "",
+    blockchainTxHash: "",
+    verificationStatus: "PENDING_INTEGRATION" as const,
+    ...e,
+    ...DEMO_FLAG,
+  };
+  return {
+    ...baseEvent,
+    eventHash: createEventHash(baseEvent),
+  };
+};
 
 /** Lagos leg: Mfr A -> Distributor Lagos -> Retailer Ikeja / Retailer Lekki */
 /** Abuja leg: Mfr A -> Distributor Abuja -> Retailer Wuse / Retailer Garki */
