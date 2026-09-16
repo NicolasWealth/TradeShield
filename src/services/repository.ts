@@ -4,18 +4,42 @@
  * UI components never talk to Firestore directly.
  */
 import { COLLECTIONS, getDb, isFirebaseConfigured } from "./firebase";
-import {
-  demoBatches,
-  demoEvents,
-  demoIncidents,
-  demoOrganizations,
-} from "./demoData";
+import { demoBatches, demoEvents, demoIncidents, demoOrganizations } from "./demoData";
 import type { Batch, CustodyEvent, Incident, Organization } from "@/types";
 
 export type DataSource = "firestore" | "demo";
 
+/**
+ * Used internally to route reads/writes: Firestore is attempted whenever it
+ * is configured, regardless of whether it currently holds any data.
+ */
 export function getDataSource(): DataSource {
   return isFirebaseConfigured() ? "firestore" : "demo";
+}
+
+/**
+ * Tracks which source most recently *actually served* the data currently on
+ * screen — distinct from getDataSource() above. If Firestore is configured
+ * but a collection comes back empty, reads silently fall back to the local
+ * demo store; this tracker reflects that fallback so the UI never labels
+ * demo data as "Firestore".
+ */
+let resolvedSource: DataSource = "demo";
+const resolvedSourceListeners = new Set<() => void>();
+
+function setResolvedSource(next: DataSource) {
+  if (resolvedSource === next) return;
+  resolvedSource = next;
+  resolvedSourceListeners.forEach((listener) => listener());
+}
+
+export function getResolvedDataSource(): DataSource {
+  return resolvedSource;
+}
+
+export function subscribeResolvedDataSource(listener: () => void): () => void {
+  resolvedSourceListeners.add(listener);
+  return () => resolvedSourceListeners.delete(listener);
 }
 
 /* ------------------------------------------------------------------ */
@@ -97,32 +121,40 @@ async function fsSet(collectionName: string, id: string, data: unknown) {
 export async function listOrganizations(): Promise<Organization[]> {
   if (getDataSource() === "firestore") {
     const rows = await fsList<Organization>(COLLECTIONS.organizations);
+    setResolvedSource(rows.length ? "firestore" : "demo");
     return rows.length ? rows : local().organizations;
   }
+  setResolvedSource("demo");
   return local().organizations;
 }
 
 export async function listBatches(): Promise<Batch[]> {
   if (getDataSource() === "firestore") {
     const rows = await fsList<Batch>(COLLECTIONS.batches);
+    setResolvedSource(rows.length ? "firestore" : "demo");
     return rows.length ? rows : local().batches;
   }
+  setResolvedSource("demo");
   return local().batches;
 }
 
 export async function listEvents(): Promise<CustodyEvent[]> {
   if (getDataSource() === "firestore") {
     const rows = await fsList<CustodyEvent>(COLLECTIONS.events);
+    setResolvedSource(rows.length ? "firestore" : "demo");
     return rows.length ? rows : local().events;
   }
+  setResolvedSource("demo");
   return local().events;
 }
 
 export async function listIncidents(): Promise<Incident[]> {
   if (getDataSource() === "firestore") {
     const rows = await fsList<Incident>(COLLECTIONS.incidents);
+    setResolvedSource(rows.length ? "firestore" : "demo");
     return rows.length ? rows : local().incidents;
   }
+  setResolvedSource("demo");
   return local().incidents;
 }
 

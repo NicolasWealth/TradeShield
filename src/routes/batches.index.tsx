@@ -66,8 +66,7 @@ function BatchesPage() {
     [batches, filter],
   );
 
-  const eventCount = (batchId: string) =>
-    events.filter((e) => e.batchId === batchId).length;
+  const eventCount = (batchId: string) => events.filter((e) => e.batchId === batchId).length;
 
   const submit = () => {
     if (!form.productName.trim()) {

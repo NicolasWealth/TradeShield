@@ -121,9 +121,7 @@ export function CombinedStatusBadge({
   }
   if (state === "LOCAL_VERIFIED") {
     return (
-      <span className={cn(base, "border-ok-500/40 bg-ok-500/10 text-ok-400")}>
-        LOCAL VERIFIED
-      </span>
+      <span className={cn(base, "border-ok-500/40 bg-ok-500/10 text-ok-400")}>LOCAL VERIFIED</span>
     );
   }
   if (state === "TAMPERED" || state === "CRYPTOGRAPHIC_MISMATCH") {
@@ -141,8 +139,6 @@ export function CombinedStatusBadge({
     );
   }
   return (
-    <span className={cn(base, "border-seal-500/40 bg-seal-500/10 text-seal-400")}>
-      UNAVAILABLE
-    </span>
+    <span className={cn(base, "border-seal-500/40 bg-seal-500/10 text-seal-400")}>UNAVAILABLE</span>
   );
 }

@@ -162,7 +162,12 @@ export const demoBatches: Batch[] = [
 ];
 
 let seq = 0;
-const evt = (e: Omit<CustodyEvent, "eventId" | "eventHash" | "blockchainTxHash" | "verificationStatus" | "isDemo">): CustodyEvent => {
+const evt = (
+  e: Omit<
+    CustodyEvent,
+    "eventId" | "eventHash" | "blockchainTxHash" | "verificationStatus" | "isDemo"
+  >,
+): CustodyEvent => {
   const baseEvent = {
     eventId: `EVT-${String(++seq).padStart(4, "0")}`,
     eventHash: "",

@@ -60,8 +60,9 @@ By isolating risk from confidence, operators can distinguish between high-risk e
 - Exposes `getAnchor(bytes32 eventHash)` returning `(bool isAnchored, uint256 timestamp)` for non-custodial verification.
 
 ### Honest Status & Current Limitations
-- **Live Testnet Status:** A live Base Sepolia contract transaction was **not completed** for demo records in this submission environment due to testnet ETH availability.
+- **Live Testnet Status:** A live Base Sepolia contract transaction was **not completed** for demo records in this submission environment. `scripts/anchor-event.ts` correctly builds the anchor calldata and validates configuration, but does not yet include transaction signing (no signing library is wired in), so it cannot submit a real transaction. This is a scoped gap in the CLI script, not a testnet funding issue.
 - **Transparent Reporting:** The application reports `UNCONFIGURED` or `PENDING` for blockchain status on demo events. No fake or synthetic transaction hashes are displayed.
+- **Read-only verification:** `verifyBlockchainAnchor` performs genuine read-only Base Sepolia RPC calls (`eth_getTransactionByHash`, `eth_getTransactionReceipt`, `eth_call`) and is covered by tests, but is not yet wired into a UI action — the Verification page currently displays blockchain status from stored event fields rather than triggering a live RPC check on demand.
 
 ---
 
@@ -83,9 +84,9 @@ By isolating risk from confidence, operators can distinguish between high-risk e
 ### Exposure Risk Matrix (0–100)
 - **30%** Affected Quantity Ratio (`affectedQuantity / totalBatchQuantity`)
 - **25%** Downstream Location Reach (Active distributor/warehouse count)
-- **25%** Consumer Endpoint Reach (Retailer nodes reached)
+- **20%** Consumer Endpoint Reach (Retailer nodes reached)
 - **10%** Geographic Scope (Unique location count)
-- **10%** Incident Severity Factor (`CONTAMINATION`: 100, `COLD_CHAIN_BREAK`: 75, `FOREIGN_BODY`: 60, `LABELLING`: 30)
+- **15%** Incident Severity Factor (`CONTAMINATION`: 100, `COLD_CHAIN_BREAK`: 75, `FOREIGN_BODY`: 60, `LABELLING`: 30)
 
 ### Evidence Confidence Matrix (0–100)
 - **25%** Event Completeness (Presence of production and custody transfer events)

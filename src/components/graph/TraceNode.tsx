@@ -43,9 +43,7 @@ export function TraceNode({ data, selected }: NodeProps<Node<GraphNodeData>>) {
           title={data.evidenceState.replace(/_/g, " ")}
         />
       </div>
-      <p className="truncate font-display text-sm font-medium text-foreground">
-        {data.label}
-      </p>
+      <p className="truncate font-display text-sm font-medium text-foreground">{data.label}</p>
       <p className="truncate text-xs text-mist-400">{data.subtitle}</p>
       <dl className="mt-2 space-y-0.5">
         {data.detail.slice(0, 3).map((d) => (

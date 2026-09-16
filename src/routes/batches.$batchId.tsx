@@ -236,9 +236,7 @@ function BatchDetailPage() {
       <div className="mt-6 grid gap-5 lg:grid-cols-3">
         <section className="rounded-lg border border-border bg-card p-4 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-display text-sm font-semibold text-foreground">
-              Chain of custody
-            </h2>
+            <h2 className="font-display text-sm font-semibold text-foreground">Chain of custody</h2>
             <BatchStatusBadge status={batch.status} />
           </div>
           <CustodyTimeline events={batchEvents} organizations={organizations} />
@@ -246,9 +244,7 @@ function BatchDetailPage() {
 
         <section className="space-y-5">
           <div className="rounded-lg border border-border bg-card p-4">
-            <h2 className="font-display text-sm font-semibold text-foreground">
-              Linked incidents
-            </h2>
+            <h2 className="font-display text-sm font-semibold text-foreground">Linked incidents</h2>
             <ul className="mt-3 space-y-3">
               {linkedIncidents.map((i) => (
                 <li key={i.incidentId}>
@@ -272,12 +268,10 @@ function BatchDetailPage() {
           </div>
 
           <div className="rounded-lg border border-border bg-card p-4">
-            <h2 className="font-display text-sm font-semibold text-foreground">
-              Chain anchoring
-            </h2>
+            <h2 className="font-display text-sm font-semibold text-foreground">Chain anchoring</h2>
             <p className="mt-2 text-xs text-muted-foreground">
-              Event hashes and transaction references are reserved on every custody record
-              but stay empty until the blockchain layer is integrated.
+              Event hashes and transaction references are reserved on every custody record but stay
+              empty until the blockchain layer is integrated.
             </p>
             <Link
               to="/verification"

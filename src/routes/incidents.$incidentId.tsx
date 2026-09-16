@@ -34,10 +34,7 @@ function IncidentDetailPage() {
   const batch = batches.find((b) => b.batchId === incident?.batchId);
 
   const analysis = useMemo(
-    () =>
-      incident
-        ? analyseIncident({ incident, batch, events, organizations })
-        : null,
+    () => (incident ? analyseIncident({ incident, batch, events, organizations }) : null),
     [incident, batch, events, organizations],
   );
 
@@ -128,24 +125,71 @@ function IncidentDetailPage() {
               </h2>
               <div className="mt-3 grid gap-4 sm:grid-cols-2 text-xs">
                 <div>
-                  <p className="font-mono text-[10px] uppercase text-muted-foreground mb-2">Exposure Factors</p>
+                  <p className="font-mono text-[10px] uppercase text-muted-foreground mb-2">
+                    Exposure Factors
+                  </p>
                   <ul className="space-y-1 text-mist-300">
-                    <li className="flex justify-between"><span>Quantity Ratio (30%)</span><span className="font-mono">{analysis.riskFactors.affectedQuantityRatio}</span></li>
-                    <li className="flex justify-between"><span>Downstream Reach (25%)</span><span className="font-mono">{analysis.riskFactors.downstreamReach}</span></li>
-                    <li className="flex justify-between"><span>Consumer Reach (20%)</span><span className="font-mono">{analysis.riskFactors.consumerFacingReach}</span></li>
-                    <li className="flex justify-between"><span>Geographic Reach (10%)</span><span className="font-mono">{analysis.riskFactors.geographicReach}</span></li>
-                    <li className="flex justify-between"><span>Severity Score (15%)</span><span className="font-mono">{analysis.riskFactors.incidentSeverity}</span></li>
+                    <li className="flex justify-between">
+                      <span>Quantity Ratio (30%)</span>
+                      <span className="font-mono">
+                        {analysis.riskFactors.affectedQuantityRatio}
+                      </span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Downstream Reach (25%)</span>
+                      <span className="font-mono">{analysis.riskFactors.downstreamReach}</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Consumer Reach (20%)</span>
+                      <span className="font-mono">{analysis.riskFactors.consumerFacingReach}</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Geographic Reach (10%)</span>
+                      <span className="font-mono">{analysis.riskFactors.geographicReach}</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Severity Score (15%)</span>
+                      <span className="font-mono">{analysis.riskFactors.incidentSeverity}</span>
+                    </li>
                   </ul>
                 </div>
                 <div>
-                  <p className="font-mono text-[10px] uppercase text-muted-foreground mb-2">Evidence Factors</p>
+                  <p className="font-mono text-[10px] uppercase text-muted-foreground mb-2">
+                    Evidence Factors
+                  </p>
                   <ul className="space-y-1 text-mist-300">
-                    <li className="flex justify-between"><span>Event Completeness (25%)</span><span className="font-mono">{analysis.evidenceFactors.eventCompleteness}</span></li>
-                    <li className="flex justify-between"><span>Chain Integrity (25%)</span><span className="font-mono">{analysis.evidenceFactors.chainIntegrity}</span></li>
-                    <li className="flex justify-between"><span>Inventory Accounting (20%)</span><span className="font-mono">{analysis.evidenceFactors.inventoryAccounting}</span></li>
-                    <li className="flex justify-between"><span>Temporal Consistency (10%)</span><span className="font-mono">{analysis.evidenceFactors.temporalConsistency}</span></li>
-                    <li className="flex justify-between"><span>Org Completeness (10%)</span><span className="font-mono">{analysis.evidenceFactors.organizationCompleteness}</span></li>
-                    <li className="flex justify-between"><span>Anomaly Quality (10%)</span><span className="font-mono">{analysis.evidenceFactors.anomalyQuality}</span></li>
+                    <li className="flex justify-between">
+                      <span>Event Completeness (25%)</span>
+                      <span className="font-mono">
+                        {analysis.evidenceFactors.eventCompleteness}
+                      </span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Chain Integrity (25%)</span>
+                      <span className="font-mono">{analysis.evidenceFactors.chainIntegrity}</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Inventory Accounting (20%)</span>
+                      <span className="font-mono">
+                        {analysis.evidenceFactors.inventoryAccounting}
+                      </span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Temporal Consistency (10%)</span>
+                      <span className="font-mono">
+                        {analysis.evidenceFactors.temporalConsistency}
+                      </span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Org Completeness (10%)</span>
+                      <span className="font-mono">
+                        {analysis.evidenceFactors.organizationCompleteness}
+                      </span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Anomaly Quality (10%)</span>
+                      <span className="font-mono">{analysis.evidenceFactors.anomalyQuality}</span>
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -214,9 +258,7 @@ function IncidentDetailPage() {
                 </li>
               ))}
               {analysis.affectedLocations.length === 0 ? (
-                <li className="text-sm text-muted-foreground">
-                  Nothing has moved downstream yet.
-                </li>
+                <li className="text-sm text-muted-foreground">Nothing has moved downstream yet.</li>
               ) : null}
             </ul>
             <Link

@@ -8,12 +8,7 @@ import {
   CryptoStatusBadge,
 } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTraceData } from "@/hooks/useTraceData";
@@ -26,6 +21,8 @@ import {
 } from "@/services/eventHash";
 import {
   getEventVerificationSummary,
+  isWeb3Configured,
+  verifyBlockchainAnchor,
   WEB3_CONFIG,
 } from "@/services/web3Anchor";
 import type { CustodyEvent } from "@/types";
@@ -42,7 +39,8 @@ export const Route = createFileRoute("/verification")({
       { property: "og:title", content: "Verification ledger — TraceShield" },
       {
         property: "og:description",
-        content: "Deterministic cryptographic verification and Base Sepolia Web3 chain anchoring ledger.",
+        content:
+          "Deterministic cryptographic verification and Base Sepolia Web3 chain anchoring ledger.",
       },
     ],
   }),
@@ -55,13 +53,22 @@ function VerificationPage() {
   const [tamperedQuantity, setTamperedQuantity] = useState<string>("");
   const [tamperedLocation, setTamperedLocation] = useState<string>("");
   const [isTampering, setIsTampering] = useState<boolean>(false);
+  const [liveCheck, setLiveCheck] = useState<{
+    status: "idle" | "checking" | "done";
+    result: Awaited<ReturnType<typeof verifyBlockchainAnchor>> | null;
+  }>({ status: "idle", result: null });
 
   const name = (id: string) =>
-    organizations.find((o: { organizationId: string; name: string }) => o.organizationId === id)?.name ?? id;
+    organizations.find((o: { organizationId: string; name: string }) => o.organizationId === id)
+      ?.name ?? id;
 
   const cryptoMatches = events.filter((e: CustodyEvent) => verifyEventHash(e) === "MATCH").length;
-  const cryptoMismatches = events.filter((e: CustodyEvent) => verifyEventHash(e) === "MISMATCH").length;
-  const blockchainVerified = events.filter((e: CustodyEvent) => e.verificationStatus === "VERIFIED").length;
+  const cryptoMismatches = events.filter(
+    (e: CustodyEvent) => verifyEventHash(e) === "MISMATCH",
+  ).length;
+  const blockchainVerified = events.filter(
+    (e: CustodyEvent) => e.verificationStatus === "VERIFIED",
+  ).length;
   const pendingAnchors = events.length - blockchainVerified;
 
   const openInspector = (event: CustodyEvent) => {
@@ -69,6 +76,14 @@ function VerificationPage() {
     setTamperedQuantity(String(event.quantity));
     setTamperedLocation(event.location);
     setIsTampering(false);
+    setLiveCheck({ status: "idle", result: null });
+  };
+
+  const runLiveCheck = async () => {
+    if (!selectedEvent) return;
+    setLiveCheck({ status: "checking", result: null });
+    const result = await verifyBlockchainAnchor(selectedEvent);
+    setLiveCheck({ status: "done", result });
   };
 
   const inspectPayloadEvent: CustodyEvent | null = selectedEvent
@@ -121,11 +136,14 @@ function VerificationPage() {
         <p className="mt-2 text-sm text-mist-400">
           TraceShield provides cryptographic proof of supply-chain custody:
           <br />
-          <strong>Layer 1 (Local Integrity):</strong> Deterministic SHA-256 fingerprint generated from canonical payload fields.
+          <strong>Layer 1 (Local Integrity):</strong> Deterministic SHA-256 fingerprint generated
+          from canonical payload fields.
           <br />
-          <strong>Layer 2 (Blockchain Existence):</strong> Immutable 32-byte event hash anchored on Base Sepolia contract.
+          <strong>Layer 2 (Blockchain Existence):</strong> Immutable 32-byte event hash anchored on
+          Base Sepolia contract.
           <br />
-          <strong>Layer 3 (Combined Proof):</strong> Immediate tamper detection when any canonical field is modified.
+          <strong>Layer 3 (Combined Proof):</strong> Immediate tamper detection when any canonical
+          field is modified.
         </p>
       </div>
 
@@ -199,7 +217,10 @@ function VerificationPage() {
       </div>
 
       {/* Cryptographic & Web3 Hash Inspection Modal */}
-      <Dialog open={Boolean(selectedEvent)} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+      <Dialog
+        open={Boolean(selectedEvent)}
+        onOpenChange={(open) => !open && setSelectedEvent(null)}
+      >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 font-display text-base">
@@ -211,26 +232,34 @@ function VerificationPage() {
             <div className="space-y-4 text-xs">
               <div className="rounded border border-border bg-secondary/30 p-3">
                 <p className="text-mist-300">
-                  <span className="font-semibold text-foreground">Explanation:</span> This SHA-256 fingerprint guarantees data integrity. Changing any hashed event field produces a different hash.
+                  <span className="font-semibold text-foreground">Explanation:</span> This SHA-256
+                  fingerprint guarantees data integrity. Changing any hashed event field produces a
+                  different hash.
                 </p>
               </div>
 
               {/* Status Banner */}
               <div className="grid gap-2 sm:grid-cols-3 rounded border border-border bg-card p-3">
                 <div>
-                  <div className="text-[10px] font-mono uppercase text-muted-foreground">Local Integrity</div>
+                  <div className="text-[10px] font-mono uppercase text-muted-foreground">
+                    Local Integrity
+                  </div>
                   <div className="mt-1">
                     <CryptoStatusBadge status={inspectSummary.cryptoStatus} />
                   </div>
                 </div>
                 <div>
-                  <div className="text-[10px] font-mono uppercase text-muted-foreground">Blockchain Status</div>
+                  <div className="text-[10px] font-mono uppercase text-muted-foreground">
+                    Blockchain Status
+                  </div>
                   <div className="mt-1">
                     <BlockchainStatusBadge status={inspectSummary.blockchainStatus} />
                   </div>
                 </div>
                 <div>
-                  <div className="text-[10px] font-mono uppercase text-muted-foreground">Combined Overall</div>
+                  <div className="text-[10px] font-mono uppercase text-muted-foreground">
+                    Combined Overall
+                  </div>
                   <div className="mt-1">
                     <CombinedStatusBadge state={inspectSummary.combinedState} />
                   </div>
@@ -246,23 +275,63 @@ function VerificationPage() {
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Anchor Contract:</span>
                   <span className="text-mist-300">
-                    {WEB3_CONFIG.contractAddress ? (
-                      `${WEB3_CONFIG.contractAddress.slice(0, 10)}...${WEB3_CONFIG.contractAddress.slice(-8)}`
-                    ) : (
-                      "Not configured (Set VITE_ANCHOR_CONTRACT_ADDRESS)"
-                    )}
+                    {WEB3_CONFIG.contractAddress
+                      ? `${WEB3_CONFIG.contractAddress.slice(0, 10)}...${WEB3_CONFIG.contractAddress.slice(-8)}`
+                      : "Not configured (Set VITE_ANCHOR_CONTRACT_ADDRESS)"}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Transaction Hash:</span>
                   <span className="text-mist-300">
-                    {selectedEvent.blockchainTxHash ? (
-                      selectedEvent.blockchainTxHash
-                    ) : (
-                      "Blockchain: Not anchored"
-                    )}
+                    {selectedEvent.blockchainTxHash
+                      ? selectedEvent.blockchainTxHash
+                      : "Blockchain: Not anchored"}
                   </span>
                 </div>
+              </div>
+
+              {/* Live On-Chain Check */}
+              <div className="rounded border border-border bg-card p-3 space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-mono text-[11px] font-semibold text-foreground">
+                    Layer 2 — Live Base Sepolia Check
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="font-mono text-[11px]"
+                    disabled={
+                      liveCheck.status === "checking" ||
+                      !selectedEvent.blockchainTxHash ||
+                      !isWeb3Configured()
+                    }
+                    onClick={runLiveCheck}
+                  >
+                    {liveCheck.status === "checking" ? "Checking chain..." : "Verify on-chain now"}
+                  </Button>
+                </div>
+                {!isWeb3Configured() ? (
+                  <p className="text-[11px] text-mist-400">
+                    Anchor contract not configured (set VITE_ANCHOR_CONTRACT_ADDRESS) — live check
+                    unavailable.
+                  </p>
+                ) : !selectedEvent.blockchainTxHash ? (
+                  <p className="text-[11px] text-mist-400">
+                    This event has no recorded transaction hash, so there is nothing to check
+                    on-chain yet.
+                  </p>
+                ) : liveCheck.status === "done" && liveCheck.result ? (
+                  <p
+                    className={`text-[11px] ${liveCheck.result.isAnchored ? "text-ok-400" : "text-mist-300"}`}
+                  >
+                    {liveCheck.result.message}
+                  </p>
+                ) : (
+                  <p className="text-[11px] text-mist-400">
+                    Runs a live eth_getTransactionByHash / eth_getTransactionReceipt / eth_call
+                    sequence against Base Sepolia.
+                  </p>
+                )}
               </div>
 
               {/* Hash Comparison */}
@@ -274,8 +343,12 @@ function VerificationPage() {
                   </div>
                 </div>
                 <div className="pt-2 border-t border-border/60">
-                  <div className="text-muted-foreground">RECALCULATED EVENT HASH (Current Data):</div>
-                  <div className={`mt-0.5 break-all ${inspectSummary.cryptoStatus === "MISMATCH" ? "text-crit-400 font-bold" : "text-ok-400"}`}>
+                  <div className="text-muted-foreground">
+                    RECALCULATED EVENT HASH (Current Data):
+                  </div>
+                  <div
+                    className={`mt-0.5 break-all ${inspectSummary.cryptoStatus === "MISMATCH" ? "text-crit-400 font-bold" : "text-ok-400"}`}
+                  >
                     {createEventHash(inspectPayloadEvent)}
                   </div>
                 </div>

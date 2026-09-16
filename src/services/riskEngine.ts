@@ -16,22 +16,6 @@ import type {
 
 const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
 
-const TYPE_SEVERITY: Record<Incident["type"], number> = {
-  CONTAMINATION: 45,
-  COLD_CHAIN_BREAK: 30,
-  FOREIGN_BODY: 35,
-  LABELLING: 12,
-  OTHER: 18,
-};
-
-const TYPE_EVIDENCE: Record<Incident["type"], number> = {
-  CONTAMINATION: 40,
-  COLD_CHAIN_BREAK: 30,
-  FOREIGN_BODY: 28,
-  LABELLING: 35,
-  OTHER: 20,
-};
-
 export const PRIORITY_LABEL: Record<Priority, string> = {
   IMMEDIATE_RECALL: "Immediate Recall",
   URGENT_INVESTIGATION: "Urgent Investigation",
@@ -100,10 +84,8 @@ export function calculateInventoryFlow(
   events: CustodyEvent[],
   organizations: Organization[],
 ): InventoryFlowResult {
-  const orgName = (id: string) =>
-    organizations.find((o) => o.organizationId === id)?.name ?? id;
-  const getOrg = (id: string) =>
-    organizations.find((o) => o.organizationId === id);
+  const orgName = (id: string) => organizations.find((o) => o.organizationId === id)?.name ?? id;
+  const getOrg = (id: string) => organizations.find((o) => o.organizationId === id);
 
   const batchId = batch?.batchId ?? events[0]?.batchId ?? "UNKNOWN";
   const batchEvents = events.filter((e) => e.batchId === batchId);
@@ -129,9 +111,7 @@ export function calculateInventoryFlow(
   uniqueEvents.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
 
   // Determine starting batch quantity
-  const totalBatchQty =
-    batch?.quantity ??
-    Math.max(...uniqueEvents.map((e) => e.quantity), 0);
+  const totalBatchQty = batch?.quantity ?? Math.max(...uniqueEvents.map((e) => e.quantity), 0);
 
   const evidenceGaps: string[] = [];
   let brokenLinksCount = 0;
@@ -319,15 +299,19 @@ export function analyseIncident({
     .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
 
   const flow = calculateInventoryFlow(batch, events, organizations);
-  const { affectedLocations, affectedQuantity, accountedQuantity, unaccountedQuantity, evidenceGaps } = flow;
+  const {
+    affectedLocations,
+    affectedQuantity,
+    accountedQuantity,
+    unaccountedQuantity,
+    evidenceGaps,
+  } = flow;
 
   const totalBatchQty = batch?.quantity ?? Math.max(affectedQuantity, 1);
   const affectedRatio = Math.min(1, affectedQuantity / totalBatchQty);
 
   const retailLocations = affectedLocations.filter((l) =>
-    organizations.some(
-      (o) => o.name === l.organization && o.type === "RETAILER",
-    ),
+    organizations.some((o) => o.name === l.organization && o.type === "RETAILER"),
   );
   const retailReachCount = retailLocations.length;
 
@@ -343,10 +327,10 @@ export function analyseIncident({
   const incidentSeverityFactor = SEVERITY_SCORES[incident.type] ?? 25;
 
   const rawExposureRisk =
-    affectedQuantityRatioFactor * 0.30 +
+    affectedQuantityRatioFactor * 0.3 +
     downstreamReachFactor * 0.25 +
-    consumerFacingReachFactor * 0.20 +
-    geographicReachFactor * 0.10 +
+    consumerFacingReachFactor * 0.2 +
+    geographicReachFactor * 0.1 +
     incidentSeverityFactor * 0.15;
 
   const exposureRisk = clamp(rawExposureRisk);
@@ -384,7 +368,9 @@ export function analyseIncident({
       const parent = eventMap.get(e.previousEventId);
       if (parent && parent.timestamp > e.timestamp) {
         temporalInconsistencies++;
-        evidenceGaps.push(`Temporal anomaly: Event ${e.eventId} timestamp is earlier than previous event ${parent.eventId}.`);
+        evidenceGaps.push(
+          `Temporal anomaly: Event ${e.eventId} timestamp is earlier than previous event ${parent.eventId}.`,
+        );
       }
     }
   }
@@ -398,7 +384,9 @@ export function analyseIncident({
     if (!orgMap.has(e.toOrganization)) unknownOrgsCount++;
   }
   if (unknownOrgsCount > 0) {
-    evidenceGaps.push(`${unknownOrgsCount} custody transfer reference organization(s) not in registry.`);
+    evidenceGaps.push(
+      `${unknownOrgsCount} custody transfer reference organization(s) not in registry.`,
+    );
   }
   const organizationCompletenessFactor = clamp(100 - unknownOrgsCount * 25);
 
@@ -415,10 +403,10 @@ export function analyseIncident({
   const rawEvidenceConfidence =
     eventCompletenessFactor * 0.25 +
     chainIntegrityFactor * 0.25 +
-    inventoryAccountingFactor * 0.20 +
-    temporalConsistencyFactor * 0.10 +
-    organizationCompletenessFactor * 0.10 +
-    anomalyQualityFactor * 0.10;
+    inventoryAccountingFactor * 0.2 +
+    temporalConsistencyFactor * 0.1 +
+    organizationCompletenessFactor * 0.1 +
+    anomalyQualityFactor * 0.1;
 
   const evidenceConfidence = clamp(rawEvidenceConfidence);
 

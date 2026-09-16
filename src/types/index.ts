@@ -34,12 +34,7 @@ export interface Batch {
 }
 
 export type CustodyEventType =
-  | "PRODUCED"
-  | "SHIPPED"
-  | "RECEIVED"
-  | "STORED"
-  | "INSPECTED"
-  | "SOLD";
+  "PRODUCED" | "SHIPPED" | "RECEIVED" | "STORED" | "INSPECTED" | "SOLD";
 
 /**
  * Blockchain anchoring is NOT implemented in this MVP.
@@ -65,11 +60,7 @@ export interface CustodyEvent {
 }
 
 export type IncidentType =
-  | "CONTAMINATION"
-  | "COLD_CHAIN_BREAK"
-  | "FOREIGN_BODY"
-  | "LABELLING"
-  | "OTHER";
+  "CONTAMINATION" | "COLD_CHAIN_BREAK" | "FOREIGN_BODY" | "LABELLING" | "OTHER";
 
 export type IncidentStatus = "OPEN" | "INVESTIGATING" | "RESOLVED" | "CLOSED";
 
@@ -84,11 +75,7 @@ export interface Incident {
   isDemo?: boolean;
 }
 
-export type Priority =
-  | "IMMEDIATE_RECALL"
-  | "URGENT_INVESTIGATION"
-  | "MONITOR"
-  | "VERIFY_EVIDENCE";
+export type Priority = "IMMEDIATE_RECALL" | "URGENT_INVESTIGATION" | "MONITOR" | "VERIFY_EVIDENCE";
 
 export interface AffectedLocation {
   location: string;

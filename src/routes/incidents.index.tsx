@@ -200,9 +200,7 @@ function IncidentsPage() {
                   <PriorityBadge priority={a.priority} />
                 </span>
               </div>
-              <p className="mt-2 line-clamp-2 text-sm text-mist-400">
-                {incident.description}
-              </p>
+              <p className="mt-2 line-clamp-2 text-sm text-mist-400">{incident.description}</p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 <div>
                   <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">

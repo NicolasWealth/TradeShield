@@ -1,13 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useState, type MouseEvent } from "react";
-import {
-  Background,
-  Controls,
-  MiniMap,
-  ReactFlow,
-  type Edge,
-  type Node,
-} from "@xyflow/react";
+import { Background, Controls, MiniMap, ReactFlow, type Edge, type Node } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { AppShell } from "@/components/layout/AppShell";
 import { TraceNode } from "@/components/graph/TraceNode";
@@ -76,15 +69,7 @@ const LEGEND = [
 function SupplyChainPage() {
   const { batch, incident } = Route.useSearch();
   const navigate = useNavigate();
-  const {
-    organizations,
-    batches,
-    events,
-    incidents,
-    isLoading,
-    isError,
-    error,
-  } = useTraceData();
+  const { organizations, batches, events, incidents, isLoading, isError, error } = useTraceData();
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
 
@@ -96,20 +81,12 @@ function SupplyChainPage() {
   );
 
   const highlighted = useMemo(
-    () =>
-      applyInvestigationHighlight(
-        graph.nodes,
-        graph.edges,
-        selectedNodeId,
-        selectedEdgeId,
-      ),
+    () => applyInvestigationHighlight(graph.nodes, graph.edges, selectedNodeId, selectedEdgeId),
     [graph.nodes, graph.edges, selectedNodeId, selectedEdgeId],
   );
 
-  const selectedNode =
-    highlighted.nodes.find((node) => node.id === selectedNodeId) ?? null;
-  const selectedEdge =
-    highlighted.edges.find((edge) => edge.id === selectedEdgeId) ?? null;
+  const selectedNode = highlighted.nodes.find((node) => node.id === selectedNodeId) ?? null;
+  const selectedEdge = highlighted.edges.find((edge) => edge.id === selectedEdgeId) ?? null;
   const selectedBatch = batch ? batches.find((b) => b.batchId === batch) : null;
   const selectedAnalysis = selectedIncident
     ? graph.analysesByBatch[selectedIncident.batchId]
@@ -121,21 +98,15 @@ function SupplyChainPage() {
     setSelectedEdgeId(null);
   }, []);
 
-  const handleNodeClick = useCallback(
-    (_: MouseEvent, node: Node<GraphNodeData>) => {
-      setSelectedNodeId(node.id);
-      setSelectedEdgeId(null);
-    },
-    [],
-  );
+  const handleNodeClick = useCallback((_: MouseEvent, node: Node<GraphNodeData>) => {
+    setSelectedNodeId(node.id);
+    setSelectedEdgeId(null);
+  }, []);
 
-  const handleEdgeClick = useCallback(
-    (_: MouseEvent, edge: Edge<GraphEdgeData>) => {
-      setSelectedEdgeId(edge.id);
-      setSelectedNodeId(null);
-    },
-    [],
-  );
+  const handleEdgeClick = useCallback((_: MouseEvent, edge: Edge<GraphEdgeData>) => {
+    setSelectedEdgeId(edge.id);
+    setSelectedNodeId(null);
+  }, []);
 
   const updateBatch = (value: string) => {
     clearSelection();

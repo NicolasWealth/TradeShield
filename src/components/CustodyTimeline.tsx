@@ -8,13 +8,10 @@ interface Props {
 }
 
 export function CustodyTimeline({ events, organizations }: Props) {
-  const name = (id: string) =>
-    organizations.find((o) => o.organizationId === id)?.name ?? id;
+  const name = (id: string) => organizations.find((o) => o.organizationId === id)?.name ?? id;
 
   if (events.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">No custody events recorded yet.</p>
-    );
+    return <p className="text-sm text-muted-foreground">No custody events recorded yet.</p>;
   }
 
   return (

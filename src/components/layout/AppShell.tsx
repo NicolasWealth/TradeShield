@@ -11,7 +11,7 @@ import {
   Siren,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { getDataSource } from "@/services/repository";
+import { useResolvedDataSource } from "@/hooks/useTraceData";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -34,6 +34,7 @@ export function AppShell({ title, subtitle, actions, children }: AppShellProps) 
   const { user, ready, signOut } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const dataSource = useResolvedDataSource();
 
   useEffect(() => {
     if (ready && !user) navigate({ to: "/login" });
@@ -56,8 +57,7 @@ export function AppShell({ title, subtitle, actions, children }: AppShellProps) 
 
         <nav className="flex-1 space-y-1 p-3">
           {NAV.map((item) => {
-            const active =
-              pathname === item.to || pathname.startsWith(`${item.to}/`);
+            const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
             return (
               <Link
                 key={item.to}
@@ -69,9 +69,7 @@ export function AppShell({ title, subtitle, actions, children }: AppShellProps) 
                     : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground",
                 )}
               >
-                <item.icon
-                  className={cn("size-4", active ? "text-primary" : "text-mist-500")}
-                />
+                <item.icon className={cn("size-4", active ? "text-primary" : "text-mist-500")} />
                 {item.label}
               </Link>
             );
@@ -82,11 +80,9 @@ export function AppShell({ title, subtitle, actions, children }: AppShellProps) 
           <div className="flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-2">
             <ScrollText className="size-4 text-mist-500" />
             <div className="min-w-0 flex-1 leading-tight">
-              <p className="truncate text-xs text-foreground">
-                {user?.displayName ?? "—"}
-              </p>
+              <p className="truncate text-xs text-foreground">{user?.displayName ?? "—"}</p>
               <p className="truncate font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                {getDataSource() === "firestore" ? "Firestore" : "Demo data"}
+                {dataSource === "firestore" ? "Firestore" : "Demo data"}
               </p>
             </div>
             <button
@@ -111,9 +107,7 @@ export function AppShell({ title, subtitle, actions, children }: AppShellProps) 
               <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">
                 {title}
               </h1>
-              {subtitle ? (
-                <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>
-              ) : null}
+              {subtitle ? <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p> : null}
             </div>
             <div className="flex items-center gap-2">{actions}</div>
           </div>

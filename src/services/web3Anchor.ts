@@ -65,12 +65,30 @@ export function keccak256Hex(message: string): string {
   const bytes = new TextEncoder().encode(message);
 
   const ROUND_CONSTANTS: bigint[] = [
-    0x0000000000000001n, 0x0000000000008082n, 0x800000000000808an, 0x8000000080008000n,
-    0x000000000000808bn, 0x0000000080000001n, 0x8000000080008081n, 0x8000000000008009n,
-    0x000000000000008an, 0x0000000000000088n, 0x0000000080008009n, 0x000000008000000an,
-    0x000000008000808bn, 0x800000000000008bn, 0x8000000000008089n, 0x8000000000008003n,
-    0x8000000000008002n, 0x8000000000000080n, 0x000000000000800an, 0x800000008000000an,
-    0x8000000080008081n, 0x8000000000008080n, 0x0000000080000001n, 0x8000000080008008n,
+    0x0000000000000001n,
+    0x0000000000008082n,
+    0x800000000000808an,
+    0x8000000080008000n,
+    0x000000000000808bn,
+    0x0000000080000001n,
+    0x8000000080008081n,
+    0x8000000000008009n,
+    0x000000000000008an,
+    0x0000000000000088n,
+    0x0000000080008009n,
+    0x000000008000000an,
+    0x000000008000808bn,
+    0x800000000000008bn,
+    0x8000000000008089n,
+    0x8000000000008003n,
+    0x8000000000008002n,
+    0x8000000000000080n,
+    0x000000000000800an,
+    0x800000008000000an,
+    0x8000000080008081n,
+    0x8000000000008080n,
+    0x0000000080000001n,
+    0x8000000080008008n,
   ];
 
   const R = [
@@ -171,7 +189,11 @@ export async function verifyBlockchainAnchor(
   event: Partial<CustodyEvent>,
 ): Promise<{ verified: boolean; isAnchored: boolean; timestamp?: number; message: string }> {
   if (!event.blockchainTxHash || !event.blockchainTxHash.trim()) {
-    return { verified: false, isAnchored: false, message: "No transaction hash recorded for event" };
+    return {
+      verified: false,
+      isAnchored: false,
+      message: "No transaction hash recorded for event",
+    };
   }
 
   if (!isWeb3Configured()) {
@@ -197,13 +219,23 @@ export async function verifyBlockchainAnchor(
 
     if (!txRes.ok) {
       clearTimeout(timeoutId);
-      return { verified: false, isAnchored: false, message: `RPC response error: ${txRes.statusText}` };
+      return {
+        verified: false,
+        isAnchored: false,
+        message: `RPC response error: ${txRes.statusText}`,
+      };
     }
 
-    const txData = (await txRes.json()) as { result?: { input?: string; hash?: string; blockNumber?: string } };
+    const txData = (await txRes.json()) as {
+      result?: { input?: string; hash?: string; blockNumber?: string };
+    };
     if (!txData.result) {
       clearTimeout(timeoutId);
-      return { verified: false, isAnchored: false, message: "Transaction hash not found on Base Sepolia" };
+      return {
+        verified: false,
+        isAnchored: false,
+        message: "Transaction hash not found on Base Sepolia",
+      };
     }
 
     // Step B: Fetch transaction receipt
@@ -223,7 +255,11 @@ export async function verifyBlockchainAnchor(
 
     if (!receiptData.result || receiptData.result.status !== "0x1") {
       clearTimeout(timeoutId);
-      return { verified: false, isAnchored: false, message: "Transaction receipt failed or pending on chain" };
+      return {
+        verified: false,
+        isAnchored: false,
+        message: "Transaction receipt failed or pending on chain",
+      };
     }
 
     // Step C: Verify contract state via eth_call (getAnchor)
@@ -272,7 +308,11 @@ export async function verifyBlockchainAnchor(
     };
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err);
-    return { verified: false, isAnchored: false, message: `Blockchain verification check failed: ${errorMsg}` };
+    return {
+      verified: false,
+      isAnchored: false,
+      message: `Blockchain verification check failed: ${errorMsg}`,
+    };
   }
 }
 
@@ -318,8 +358,7 @@ export function getEventVerificationSummary(event: Partial<CustodyEvent>): Verif
   }
 
   // Layer 2 & 3 Check: Evaluates on-chain verified state
-  const isBlockchainVerified =
-    event.verificationStatus === "VERIFIED" && Boolean(txHash.trim());
+  const isBlockchainVerified = event.verificationStatus === "VERIFIED" && Boolean(txHash.trim());
 
   if (isBlockchainVerified) {
     return {

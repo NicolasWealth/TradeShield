@@ -8,10 +8,7 @@
  * Usage:
  *   npx tsx scripts/anchor-event.ts <EVENT_HASH>
  */
-import {
-  encodeAnchorEventCalldata,
-  encodeGetAnchorCalldata,
-} from "../src/services/web3Anchor";
+import { encodeAnchorEventCalldata, encodeGetAnchorCalldata } from "../src/services/web3Anchor";
 
 async function main() {
   const args = process.argv.slice(2);
@@ -24,7 +21,9 @@ async function main() {
 
   const cleanHash = eventHash.replace(/^0x/, "");
   if (cleanHash.length !== 64 || !/^[0-9a-fA-F]{64}$/.test(cleanHash)) {
-    console.error(`Invalid event hash: '${eventHash}'. Expected 32-byte (64 hex characters) SHA-256 string.`);
+    console.error(
+      `Invalid event hash: '${eventHash}'. Expected 32-byte (64 hex characters) SHA-256 string.`,
+    );
     process.exit(1);
   }
 
@@ -43,40 +42,28 @@ async function main() {
     console.error("\n[BLOCKER] Missing required environment variables:");
     if (!privateKey) console.error("  - WEB3_PRIVATE_KEY is not set.");
     if (!contractAddress) console.error("  - ANCHOR_CONTRACT_ADDRESS is not set.");
-    console.error("\nTo execute live Base Sepolia transactions, set WEB3_PRIVATE_KEY and ANCHOR_CONTRACT_ADDRESS.");
+    console.error(
+      "\nTo execute live Base Sepolia transactions, set WEB3_PRIVATE_KEY and ANCHOR_CONTRACT_ADDRESS.",
+    );
     process.exit(1);
   }
 
   const calldata = encodeAnchorEventCalldata(cleanHash);
-  console.log(`Calldata: ${calldata}`);
-  console.log("\nSubmitting transaction to Base Sepolia...");
+  console.log(`Calldata (unsigned): ${calldata}`);
 
-  try {
-    const response = await fetch(rpcUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: 1,
-        method: "eth_sendRawTransaction",
-        params: [calldata],
-      }),
-    });
-
-    const data = (await response.json()) as { result?: string; error?: { message: string } };
-
-    if (data.error) {
-      console.error(`\n[ERROR] Transaction rejected by Base Sepolia RPC: ${data.error.message}`);
-      process.exit(1);
-    }
-
-    const txHash = data.result;
-    console.log(`\nSUCCESS: Transaction submitted! Tx Hash: ${txHash}`);
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error(`\n[ERROR] Failed to execute Base Sepolia transaction: ${msg}`);
-    process.exit(1);
-  }
+  // NOTE: Transaction signing is not yet implemented. `eth_sendRawTransaction`
+  // requires a fully signed, RLP-encoded transaction (nonce, gas, chainId,
+  // to, value, data, and an ECDSA signature over all of it) — not just this
+  // ABI calldata. No signing library (ethers/viem/@noble) is wired into this
+  // script yet, so WEB3_PRIVATE_KEY is read and validated above but not used
+  // to sign anything. Submitting the raw calldata as-is would always be
+  // rejected by the RPC node, regardless of testnet ETH balance.
+  console.error("\n[NOT IMPLEMENTED] Transaction signing is not wired into this script yet.");
+  console.error("The calldata above is correct, but this script cannot yet construct and");
+  console.error("sign a full Base Sepolia transaction from it. Add a signing library");
+  console.error("(e.g. viem or ethers) here to build + sign the transaction, then submit");
+  console.error("it via eth_sendRawTransaction.");
+  process.exit(1);
 }
 
 main();

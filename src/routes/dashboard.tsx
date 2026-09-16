@@ -2,11 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { MetricCard, ScoreBar } from "@/components/MetricCard";
-import {
-  BatchStatusBadge,
-  IncidentStatusBadge,
-  PriorityBadge,
-} from "@/components/StatusBadge";
+import { BatchStatusBadge, IncidentStatusBadge, PriorityBadge } from "@/components/StatusBadge";
 import { useTraceData } from "@/hooks/useTraceData";
 import { analyseIncident } from "@/services/riskEngine";
 import { formatDate, formatNumber, titleCase } from "@/lib/format";
@@ -131,9 +127,7 @@ function DashboardPage() {
               );
             })}
             {analyses.length === 0 ? (
-              <li className="px-4 py-6 text-sm text-muted-foreground">
-                No incidents logged.
-              </li>
+              <li className="px-4 py-6 text-sm text-muted-foreground">No incidents logged.</li>
             ) : null}
           </ul>
         </section>

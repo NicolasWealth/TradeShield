@@ -63,8 +63,7 @@ const SHA256_K = [
 ];
 
 const SHA256_H = [
-  0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
-  0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
+  0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
 ];
 
 /**
@@ -113,9 +112,7 @@ export function sha256Hex(message: string): string {
   }
 
   for (i = 0; i < bytes.length; i += 4) {
-    words.push(
-      (bytes[i] << 24) | (bytes[i + 1] << 16) | (bytes[i + 2] << 8) | bytes[i + 3],
-    );
+    words.push((bytes[i] << 24) | (bytes[i + 1] << 16) | (bytes[i + 2] << 8) | bytes[i + 3]);
   }
 
   const w: number[] = new Array(64);
@@ -184,7 +181,8 @@ export function isValidEventData(event: Partial<CustodyEvent>): boolean {
   if (!event.fromOrganization || typeof event.fromOrganization !== "string") return false;
   if (!event.toOrganization || typeof event.toOrganization !== "string") return false;
   if (!event.timestamp || typeof event.timestamp !== "string") return false;
-  if (typeof event.quantity !== "number" || isNaN(event.quantity) || event.quantity < 0) return false;
+  if (typeof event.quantity !== "number" || isNaN(event.quantity) || event.quantity < 0)
+    return false;
   return true;
 }
 
@@ -202,10 +200,7 @@ export function createEventHash(event: Partial<CustodyEvent>): string {
 }
 
 export type CryptographicVerificationStatus =
-  | "MATCH"
-  | "MISMATCH"
-  | "NO_STORED_HASH"
-  | "INVALID_DATA";
+  "MATCH" | "MISMATCH" | "NO_STORED_HASH" | "INVALID_DATA";
 
 /**
  * Verifies whether the current event data matches the stored event hash.

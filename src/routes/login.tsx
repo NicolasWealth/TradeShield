@@ -45,8 +45,8 @@ function LoginPage() {
             Know exactly where the batch went — before the recall notice goes out.
           </h2>
           <p className="mt-4 text-sm text-mist-400">
-            Custody-level traceability, deterministic exposure scoring and evidence
-            confidence for food-safety operations.
+            Custody-level traceability, deterministic exposure scoring and evidence confidence for
+            food-safety operations.
           </p>
         </div>
         <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
